@@ -1,5 +1,56 @@
+// Problem Statement : 
+// 2 sum problem 
+/**
+after anlysing problem first we think the method we can use for it
+1. Brute Force
+2. By using the two pointer method
+3. By using the unorderd map 
+
+
+
+*/ 
+
+
 #include <bits/stdc++.h>
 using namespace std;
+
+// burit force method 
+void sum1(int arr[], int n, int target)
+{
+     for(int i = 0; i < n; i++)
+     {
+          for(int j = i + 1; j < n; j++)
+          {
+               int ans = arr[i] + arr[j];
+               if(ans == target)
+               {
+                    cout << "yes" << endl;
+                    return; 
+               }
+          }
+     }
+     cout << "no found" << endl;
+}
+
+// by using the unordered map method 
+void sum2(int arr[], int n, int target)
+{
+     // first create a unordered map 
+     unordered_map<int, int> map;
+     for(int i = 0; i < n; i++)
+     {
+          int complement = target - arr[i];
+          if(map.find(complement) != map.end())
+          {
+               cout << "yes" << endl;
+               return; 
+          }
+          map[arr[i]] = i;
+     }
+     cout << "no found" << endl;
+}
+
+// two pointer method 
 void sum(int arr[], int n, int target)
 {
      int i = 0;
