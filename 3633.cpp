@@ -33,3 +33,13 @@ public:
         return ans;
     }
 };
+
+int main(){
+    vector<int> landStartTime = {1, 3, 5};
+    vector<int> landDuration = {2, 4, 6};
+    vector<int> waterStartTime = {2, 4, 6};
+    vector<int> waterDuration = {1, 3, 5};
+    Solution s;
+    cout << s.earliestFinishTime(landStartTime, landDuration, waterStartTime, waterDuration) << endl;
+    return 0;
+}
