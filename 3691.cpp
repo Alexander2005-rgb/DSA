@@ -1,103 +1,86 @@
-// maximum total subaeeay value 2
-/*
-    You are given a 0-indexed integer array nums of length n and an integer k.
-    The value of a subarray is defined as the maximum element in the subarray multiplied by the minimum element in the subarray, multiplied by the length of the subarray.
-    Return the maximum value among all subarrays of nums.
-*/
-
-#include <bits/stdc++.h>  
-using namespace std;  
 class Solution {
 public:
+    struct SparseTable {
+        vector<vector<int>> mx, mn;
+        vector<int> lg;
+        int n;
+
+        SparseTable(vector<int>& nums) {
+            n = nums.size();
+
+            lg.resize(n + 1);
+            for (int i = 2; i <= n; i++) {
+                lg[i] = lg[i / 2] + 1;
+            }
+
+            int K = lg[n] + 1;
+
+            mx.assign(K, vector<int>(n));
+            mn.assign(K, vector<int>(n));
+
+            for (int i = 0; i < n; i++) {
+                mx[0][i] = nums[i];
+                mn[0][i] = nums[i];
+            }
+
+            for (int j = 1; j < K; j++) {
+                for (int i = 0; i + (1 << j) <= n; i++) {
+                    mx[j][i] = max(mx[j - 1][i],
+                                   mx[j - 1][i + (1 << (j - 1))]);
+
+                    mn[j][i] = min(mn[j - 1][i],
+                                   mn[j - 1][i + (1 << (j - 1))]);
+                }
+            }
+        }
+
+        int getMax(int l, int r) {
+            int j = lg[r - l + 1];
+            return max(mx[j][l],
+                       mx[j][r - (1 << j) + 1]);
+        }
+
+        int getMin(int l, int r) {
+            int j = lg[r - l + 1];
+            return min(mn[j][l],
+                       mn[j][r - (1 << j) + 1]);
+        }
+    };
+
     long long maxTotalValue(vector<int>& nums, int k) {
         int n = nums.size();
 
-        int max_val = *max_element(nums.begin(), nums.end());
-        int min_val = *min_element(nums.begin(), nums.end());
+        SparseTable st(nums);
 
-        if (max_val == min_val) {
-            return 0;
+        priority_queue<
+            tuple<long long, int, int>
+        > pq;
+
+        for (int l = 0; l < n; l++) {
+            long long val =
+                1LL * st.getMax(l, n - 1) -
+                st.getMin(l, n - 1);
+
+            pq.push({val, l, n - 1});
         }
 
-        long long max_value = 1LL * (max_val - min_val);
-
-        long long count_max =
-            countSubarraysContainingBoth(nums, max_val, min_val);
-
-        if (count_max >= k) {
-            return max_value * k;
-        }
-
-        return solveGeneral(nums, k);
-    }
-
-private:
-    long long countSubarraysContainingBoth(
-        const vector<int>& nums, int a, int b) {
-
-        int n = nums.size();
         long long ans = 0;
 
-        int lastA = -1, lastB = -1;
+        while (k--) {
+            auto [val, l, r] = pq.top();
+            pq.pop();
 
-        for (int r = 0; r < n; r++) {
-            if (nums[r] == a) lastA = r;
-            if (nums[r] == b) lastB = r;
+            ans += val;
 
-            if (lastA != -1 && lastB != -1) {
-                ans += min(lastA, lastB) + 1;
+            if (r > l) {
+                long long nxt =
+                    1LL * st.getMax(l, r - 1) -
+                    st.getMin(l, r - 1);
+
+                pq.push({nxt, l, r - 1});
             }
         }
 
         return ans;
     }
-
-    long long solveGeneral(vector<int>& nums, int k) {
-        int n = nums.size();
-
-        vector<int> nextGreater(n, n), prevGreater(n, -1);
-        stack<int> st;
-
-        for (int i = 0; i < n; i++) {
-            while (!st.empty() && nums[st.top()] < nums[i]) {
-                nextGreater[st.top()] = i;
-                st.pop();
-            }
-
-            if (!st.empty())
-                prevGreater[i] = st.top();
-
-            st.push(i);
-        }
-
-        while (!st.empty()) st.pop();
-
-        vector<int> nextSmaller(n, n), prevSmaller(n, -1);
-
-        for (int i = 0; i < n; i++) {
-            while (!st.empty() && nums[st.top()] > nums[i]) {
-                nextSmaller[st.top()] = i;
-                st.pop();
-            }
-
-            if (!st.empty())
-                prevSmaller[i] = st.top();
-
-            st.push(i);
-        }
-
-        // TODO:
-        // Implement the actual logic for finding the
-        // sum of the top-k subarray values.
-        // Currently returns 0 as a placeholder.
-
-        return 0;
-    }
-}; 
-int main() {
-    Solution s;
-    vector<int> nums = {1, 2, 3, 4, 5};
-    int k = 10;
-    cout << s.maximumTotalValue(nums, k) << endl;
-    return 0;
-}
+};
