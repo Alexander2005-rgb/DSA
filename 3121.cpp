@@ -48,6 +48,7 @@ public:
 
 int main(){
     Solution s;
-
-
+    string word = "aaB";
+    cout << s.numberOfSpecialChars(word) << endl;
+    return 0;
 }

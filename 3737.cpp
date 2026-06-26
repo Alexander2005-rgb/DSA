@@ -1,8 +1,10 @@
+// Problem 3737. LeetCode 3228. Count Subarrays with Majority Element 1
 #include<bits./stdc++.h>
 using namespace std;
 
 class Solution {
 public:
+    // Using Fenwick Tree
     int countMajoritySubarrays(std::vector<int>& nums, int target) {
         int n = nums.size();
         
@@ -48,6 +50,11 @@ public:
 };
 
 int main(){
+    Solution s;
+    vector<int> nums = {3, 3, 2, 1, 4};
+    int target = 3;
+    cout << s.countMajoritySubarrays(nums, target) << endl;
+    return 0;
+}
     
 
-}
